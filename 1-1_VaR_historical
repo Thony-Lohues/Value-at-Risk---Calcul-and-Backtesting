@@ -1,0 +1,27 @@
+def VaR_Historic(price_DF, conf_lvl) :
+
+    price_DF = price_DF.copy()
+    return_ = []
+    return_.append(0)
+
+    for i in range (0, len(price_DF)-1) :
+        x = np.log(price_DF.iloc[i + 1] / price_DF.iloc[i])
+        return_ = np.append(return_, x)
+
+    price_DF['Return'] = return_
+
+    # We separate our sample into 2 parts (estimation and evaluation)
+
+    DF_estimation = price_DF.iloc[0 : int(np.round(len(price_DF) * 0.25)), :]
+    DF_evaluation = price_DF.iloc[int(np.round(len(price_DF) * 0.25)) :, :]
+
+    # we calculate the variance of our estimation sample
+
+    VaR = []
+    for i in range (0,len(DF_evaluation)) :
+        VaR = np.append(VaR, np.abs(np.percentile(price_DF.iloc[i : int(np.round(len(price_DF) * 0.25 + i)), 1], 100*(1-conf_lvl))))
+    
+    DF_evaluation['Const'] = 1                              # We add constant column to keep same index with CM approach (for the tests)
+    DF_evaluation['Historic VaR'] = VaR
+    
+    return DF_evaluation
