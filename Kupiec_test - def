@@ -1,0 +1,28 @@
+# Kupiec Test - unconditional coverage
+
+# H0 = Hit ~ Bernouille iid 
+
+def Kupiec_test(DF_evaluation, conf_lvl) :
+
+    # We have to calculate hits frequency
+
+    T1 = 0      # losses are greater than VaR = +1 ~ else 0 (confidence level)
+    T0 = 0      # returns are better than VaR
+
+
+    for i in range (0, len(DF_evaluation)) :
+        if DF_evaluation.iloc[i, 1] <= -DF_evaluation.iloc[i, 3]:
+            T1 += 1
+        else :
+            T0 += 1
+
+    pi = T1 / (T0 + T1)     # Hit frequency
+
+    # Kupiec ~ Chi2 distribution with 1 dof
+    
+    alpha = sp.norm.ppf(conf_lvl)
+    
+    kupiec_stat = -2 * (T0 * np.log(conf_lvl / (1-pi)) + T1 * np.log((1-conf_lvl) / pi))
+    p_value = 1 - np.abs(sp.chi2.cdf(kupiec_stat, 1))
+
+    return kupiec_stat, p_value
