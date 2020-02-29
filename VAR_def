@@ -1,0 +1,43 @@
+
+def VaR_CreditMetrics(price_DF, conf_lvl) :                             # price_DF = DataFrame(n*1)
+
+    return_ = []
+    return_.append(0)
+
+    for i in range (0, len(price_DF)-1) :
+        x = np.log(price_DF.iloc[i + 1] / price_DF.iloc[i])
+        return_ = np.append(return_, x)
+
+    price_DF['Return'] = return_
+
+    # Risk metrics model
+
+    # We separate our sample into 2 parts (estimation and evaluation)
+
+    DF_estimation = price_DF.iloc[0 : int(np.round(len(price_DF) * 0.25)), :]
+    DF_evaluation = price_DF.iloc[int(np.round(len(price_DF) * 0.25)) :, :]
+
+    # we calculate the variance of our estimation sample
+
+    var_estim = np.var(DF_estimation.iloc[1 :, 1])
+
+    # estimation of variance for the evaluation sample
+
+    lambda_ = 0.94
+
+    variance = pd.DataFrame(np.zeros(len(DF_evaluation)))
+    variance[0] = var_estim
+
+    for i in range (1, len(DF_evaluation)) :
+        variance.iloc[i] = lambda_ * variance.iloc[i-1] + (1 - lambda_) * DF_evaluation.iloc[i-1, 1]**2
+
+    DF_evaluation['Variance'] = variance.values
+
+    # VaR calculation
+
+    alpha = sp.norm.ppf(conf_lvl)
+
+    VaR = alpha * np.sqrt(DF_evaluation['Variance'])
+    DF_evaluation['VaR'] = VaR.values
+    
+    return DF_evaluation
