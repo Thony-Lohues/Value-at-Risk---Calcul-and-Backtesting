@@ -1,6 +1,7 @@
 
 def VaR_CreditMetrics(price_DF, conf_lvl) :                             # price_DF = DataFrame(n*1)
 
+    price_DF = price_DF.copy()
     return_ = []
     return_.append(0)
 
