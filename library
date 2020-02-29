@@ -1,0 +1,29 @@
+import pandas as pd
+import numpy as np
+import scipy.stats as sp
+
+
+price_DF = pd.DataFrame(DF)
+conf_lvl = 0.95
+
+# VaR evaluation
+
+DF_evaluation = VaR_CreditMetrics(price_DF, conf_lvl)
+
+# Kupiec test
+
+kupiec_stat, p_value = Kupiec_test(DF_evaluation, conf_lvl)
+
+if p_value > 0.1 :
+  print("Don't reject VaR model")
+else :
+  print("Reject VaR model")
+
+# Christoffersen test 
+
+Christoffersen_stat, p_value = Christoffersen_test(DF_evaluation, conf_lvl)
+
+if p_value > 0.1 :
+  print("Don't reject VaR model")
+else :
+  print("Reject VaR model")
